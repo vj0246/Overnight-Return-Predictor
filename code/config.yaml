@@ -1,0 +1,56 @@
+seed: 42
+
+paths:
+  daily_dir: "../data/raw/daily"
+  minute_dir: "../data/raw/minute"
+  universe_file: "../data/universe.json"
+  output_dir: "../outputs"
+
+splits:
+  # Chronological, per PDF Section 4. Boundaries are pred_date (T) boundaries.
+  train_start: "2020-06-01"
+  train_end: "2024-03-31"
+  valid_start: "2024-04-01"
+  valid_end: "2025-04-30"
+  test_start: "2025-05-01"
+  test_end: "2026-06-30"
+  embargo_days: 5   # trading days dropped at each split boundary, both sides
+
+features:
+  price_windows: [5, 10, 20, 60]
+  vol_windows: [5, 10, 20, 60]
+  minute_roll_windows: [5, 20]
+  min_history_days: 60   # minimum trailing days required before a row is feature-eligible
+
+models:
+  magnitude:
+    objective: "regression_l1"
+    num_leaves: 63
+    learning_rate: 0.03
+    min_data_in_leaf: 100
+    feature_fraction: 0.8
+    bagging_fraction: 0.8
+    bagging_freq: 5
+    n_estimators: 3000
+    early_stopping_rounds: 100
+    log_target: true
+  direction:
+    objective: "binary"
+    num_leaves: 63
+    learning_rate: 0.03
+    min_data_in_leaf: 100
+    feature_fraction: 0.8
+    bagging_fraction: 0.8
+    bagging_freq: 5
+    n_estimators: 3000
+    early_stopping_rounds: 100
+  conf_magnitude:
+    objective: "regression_l2"
+    num_leaves: 31
+    learning_rate: 0.05
+    min_data_in_leaf: 50
+    feature_fraction: 0.8
+    bagging_fraction: 0.8
+    bagging_freq: 5
+    n_estimators: 2000
+    early_stopping_rounds: 100
